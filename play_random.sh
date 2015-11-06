@@ -81,7 +81,7 @@ if $dir
 then
   IFS='
 '
-  for d in $(find "$@" $depth -regextype posix-extended -iregex "(\./)?([^.][^/]*/?)*" -type d | sort -R)
+  for d in $(find "$@" $depth -regextype posix-extended -type d | sort -R)
   do
     find "$d" -maxdepth 1 -regextype posix-extended -iregex "(\./)?([^.][^/]*/)*([^.][^/]*)\.($FILETYPES)" | sort -R > .playlist
     if (( $(wc -l < .playlist) > 0 ))
