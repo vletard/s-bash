@@ -3,7 +3,7 @@
 # Décrypte l'ensemble des fichiers fournis en argument vers la sortie standard
 # Le décryptage est asymétrique et utilise la privée rsa par défaut
 
-dir=$(mktemp -d)
+dir=$(mktemp -d ./tmp.XXXXXXXX)
 wd=$(pwd)
 
 for f in $*

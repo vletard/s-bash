@@ -32,9 +32,9 @@ fi
 
 echo "Attention, sortie standard utilisée pour écrire l'archive !" >&2
 sleep 7
-sym_key=$(mktemp)
+sym_key=$(mktemp ./tmp.XXXXXXXX)
 head -c 64 < /dev/urandom > $sym_key
-dir=$(mktemp -d)
+dir=$(mktemp -d ./tmp.XXXXXXXX)
 dirname=$(echo $dir | rev | cut -f 1 -d "/" | rev)
 tar cvz "$@" | openssl aes-256-cbc -salt -pass file:$sym_key > $dir/data
 openssl rsautl -encrypt -pubin -inkey $recipient < $sym_key > $dir/enc
