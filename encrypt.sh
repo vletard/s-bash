@@ -32,4 +32,7 @@ fi
 
 echo "Attention, sortie standard utilisée pour écrire le fichier chiffré !" >&2
 sleep 7
-tar cvz "$@" | gpg --encrypt -r $recipient
+tmp=$(mktemp ./tmp.XXXXXXXX)
+tar cvz "$@" > $tmp
+gpg -v --encrypt -r $recipient < $tmp
+rm -f $tmp
