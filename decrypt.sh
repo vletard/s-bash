@@ -1,20 +1,9 @@
 #!/bin/bash
 
-# Décrypte l'ensemble des fichiers fournis en argument vers la sortie standard
-# Le décryptage est asymétrique et utilise la privée rsa par défaut
-
-dir=$(mktemp -d ./tmp.XXXXXXXX)
-wd=$(pwd)
+# Déchiffre chaque fichier fourni en argument
+# Le déchiffrage est asymétrique et cherche parmi les clés privées gpg disponibles
 
 for f in $*
 do
-  tar xvf $f -C $dir > /dev/null
-  cd $dir
-  subdir=$(ls)
-  openssl rsautl -decrypt -inkey ~/.ssh/id_rsa < $subdir/enc > $subdir/key
-  cd $wd
-  openssl aes-256-cbc -d -pass file:$dir/$subdir/key < $dir/$subdir/data | tar xvz
-  rm -Rvf $dir/$subdir/
+  gpg --decrypt $f | tar xvz
 done
-
-rmdir -v $dir
