@@ -54,4 +54,4 @@ then
   exit 1
 fi
 
-printf "From: %s\nTo: %s\nCC: %s\nBcc: %s\nDate: %s\nSubject: %s\n%s\n" "$from" "$to" "$cc" "$bcc" "$date" "$subject" "$message" | msmtp -t
+printf "From: %s\nTo: %s\nCC: %s\nBcc: %s\nDate: %s\nSubject: %s\nContent-Type: text/html; charset=\"UTF-8\"\n%s\n" "$from" "$to" "$cc" "$bcc" "$date" "$subject" "$message" | msmtp -t
