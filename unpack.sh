@@ -24,4 +24,9 @@ done
 
 ################ End example ##########################################################
 
-openssl aes-256-cbc -d -pass file:$HOME/.ssh/id_rsa.pub | tar xvz
+if (( $# > 0 ))
+then
+  cat $1 | openssl aes-256-cbc -d -pass file:$HOME/.ssh/id_rsa.pub | tar xvz
+else
+  openssl aes-256-cbc -d -pass file:$HOME/.ssh/id_rsa.pub | tar xvz
+fi
