@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Décrypte l'ensemble des fichiers fournis en argument vers la sortie standard
-# Le décryptage est symétrique à l'encryption de pack.sh et utilise la clé publique rsa dans ~/.ssh/
+# Le décryptage est symétrique à l'encryption de pack.sh et utilise la clé privée rsa dans ~/.ssh/
 
 ################ Example found in /usr/share/doc/util-linux/examples/getopt-parse.bash
 
@@ -15,7 +15,7 @@ eval set -- "$TEMP"
 while true ; do
 	case "$1" in
 		-l|--list)
-			openssl aes-256-cbc -d -pass file:$HOME/.ssh/id_rsa.pub | tar tz
+			openssl aes-256-cbc -d -pass file:$HOME/.ssh/id_rsa | tar tz
 			exit $? ;;
 		--) shift ; break ;;
 		*) echo "Internal error!" ; exit 1 ;;
@@ -26,7 +26,7 @@ done
 
 if (( $# > 0 ))
 then
-  cat $1 | openssl aes-256-cbc -d -pass file:$HOME/.ssh/id_rsa.pub | tar xvz
+  cat $1 | openssl aes-256-cbc -d -pass file:$HOME/.ssh/id_rsa | tar xvz
 else
-  openssl aes-256-cbc -d -pass file:$HOME/.ssh/id_rsa.pub | tar xvz
+  openssl aes-256-cbc -d -pass file:$HOME/.ssh/id_rsa | tar xvz
 fi
