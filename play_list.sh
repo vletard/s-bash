@@ -27,7 +27,7 @@ OPTIONS
 
 ################ Example found in /usr/share/doc/util-linux/examples/getopt-parse.bash
 
-TEMP=`getopt -o ln:bhs --long list,delete:,scrobble,build,help -n "$0" -- "$@"`
+TEMP=`getopt -o d:ln:bhs --long list,delete:,scrobble,build,help -n "$0" -- "$@"`
 
 if [ $? != 0 ] ; then echo "Abandon" >&2 ; exit 1 ; fi
 
