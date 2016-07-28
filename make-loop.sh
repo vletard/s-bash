@@ -27,5 +27,10 @@ done
 make -s $* || exit 1
 while sleep $delay
 do
-  make -s $* || notify-send "make error"
+  make -s $*
+  if (( $? != 0 ))
+  then
+    notify-send "make error"
+    sleep 23
+  fi
 done
