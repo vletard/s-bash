@@ -24,13 +24,14 @@ done
 
 ################ End example ##########################################################
 
-make -s $* || exit 1
+last_notification=$(date '+%s')
+make -s $*
 while sleep $delay
 do
   make -s $*
-  if (( $? != 0 ))
+  if (( $? != 0 )) && (( $(date '+%s') - $last_notification > 17 )) # 17 is arbitrary
   then
-    notify-send "make error"
-    sleep 23
+    last_notification=$(date '+%s')
+    notify-send "make error ($(date '+%H:%M:%S'))"
   fi
 done
