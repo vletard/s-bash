@@ -29,9 +29,9 @@ make -s $*
 while sleep $delay
 do
   make -s $*
-  if (( $? != 0 )) && (( $(date '+%s') - $last_notification > 17 )) # 17 is arbitrary
+  if (( $? != 0 ))
   then
-    last_notification=$(date '+%s')
+    make -t $*
     notify-send "make error ($(date '+%H:%M:%S'))"
   fi
 done
