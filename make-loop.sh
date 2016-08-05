@@ -28,10 +28,14 @@ last_notification=$(date '+%s')
 make -s $*
 while sleep $delay
 do
-  make -s $*
-  if (( $? != 0 ))
+  if ! make -q $*
   then
-    make -t $*
-    notify-send "make error ($(date '+%H:%M:%S'))"
+    reset
+    make $*
+    if (( $? != 0 ))
+    then
+      make -st $*
+      notify-send "make error ($(date '+%H:%M:%S'))"
+    fi
   fi
 done
