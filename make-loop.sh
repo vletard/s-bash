@@ -25,17 +25,26 @@ done
 ################ End example ##########################################################
 
 last_notification=$(date '+%s')
-make -s $*
-while sleep $delay
+duration=1
+while sleep $duration
 do
-  if ! make -q $*
+  if ! make -q $* || [ "$duration" = "1" ]
   then
     reset
     make $*
-    if (( $? != 0 ))
-    then
+    status=$?
+    while (( $status != 0 ))
+    do
       make -st $*
       notify-send "make error ($(date '+%H:%M:%S'))"
-    fi
+      while make -q $*
+      do
+        sleep 1
+      done
+      reset
+      make $*
+      status=$?
+    done
   fi
+  duration=$delay
 done
