@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # defaults
-from="$(printf "no-reply@factoriel.duckdns.org" )"
+from="$(printf "no-reply@$HOSTNAME" )"
 to=""
 cc=""
 bcc=""
