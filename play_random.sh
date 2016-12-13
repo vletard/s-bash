@@ -2,25 +2,26 @@
 
 limit=-0
 dir=false
+mpoptions=
 
 FILETYPES="mp3|wma|flac|caf|wav|ogg|flv|avi|mp4|mov"
 
 HELP="
-Utilisation : $0 [OPTION] [RÉPERTOIRES]
-Lit aléatoirement une fois chacun tous des fichiers $FILETYPES
-de l'arborescence du dossier courant ou des arborescences des
-RÉPERTOIRES si renseignés.
+Usage: $0 [OPTIONS] [DIRECTORIES]
+Plays each file of types $FILETYPES
+found in the specified directories in random order.
+If not directory is specified, the working directory is searched
+for files to play.
 
 OPTIONS
--n L  ou --limit L    limite la lecture à L fichiers
--n -L ou --limit -L   lit tous les fichiers sauf L
--d N  ou --depth N    limite la recherche à N niveaux
-                      de l'arborescence
---directory           lis aléatoirement par répertoire"
+-n L  ou --limit L    limits the playlist to L files
+-n -L ou --limit -L   plays every file but the last L
+-d N  ou --depth N    limits the search to N levels of depth
+--directory           group the played files by directory"
 
 ################ Example found in /usr/share/doc/util-linux/examples/getopt-parse.bash
 
-TEMP=`getopt -o d:n:h --long depth:,limit:,help,directory -n "$0" -- "$@"`
+TEMP=`getopt -o d:n:h --long novideo,depth:,limit:,help,directory -n "$0" -- "$@"`
 
 if [ $? != 0 ] ; then echo "Abandon" >&2 ; exit 1 ; fi
 
@@ -30,6 +31,7 @@ eval set -- "$TEMP"
 while true ; do
 	case "$1" in
 		-n|--limit) limit=$2 ; shift 2 ;;
+    --novideo) mpoptions="$mpoptions -novideo"; shift ;;
 		-d|--depth) depth="-maxdepth $2" ; shift 2 ;;
 		--directory) dir=true ; shift ;;
 		-h|--help) echo "$HELP"
@@ -87,7 +89,10 @@ then
     if (( $(wc -l < .playlist) > 0 ))
     then
       print_len
-      mplayer -playlist .playlist
+      IFS=' '
+      mplayer $mpoptions -playlist .playlist
+      IFS='
+'
       read -p "Continuer avec le répertoire suivant ? [O/n]" -sn 1 -t 5 cont
       echo
       if ! ([ "$cont" = "" ] || [ "$cont" = "o" ] || [ "$cont" = "O" ])
@@ -99,5 +104,6 @@ then
 else
   find "$@" $depth -regextype posix-extended -iregex "(\./)?([^.][^/]*/)*([^.][^/]*)\.($FILETYPES)" | sort -R | head -n $limit > .playlist
   print_len
-  mplayer -playlist .playlist
+  IFS=' '
+  mplayer $mpoptions -playlist .playlist
 fi
