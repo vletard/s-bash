@@ -51,7 +51,10 @@ else
       if test -d "$arg"
       then
         cd "$arg"
-        sum=$(find . -maxdepth 1 -mindepth 1 | LANG=C sort | xargs -0 $absolute_executable | $checksum_executable) # | cut -b -32)
+        sum=$(for f in $(find . -maxdepth 1 -mindepth 1 | LANG=C sort)
+        do
+          $absolute_executable $f
+        done | $checksum_executable | cut -f 1 -d ' ')
         printf "\033[2K" >&2
         echo "$sum  $arg"
         cd - > /dev/null
