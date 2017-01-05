@@ -17,7 +17,8 @@ OPTIONS
 -n L  ou --limit L    limits the playlist to L files
 -n -L ou --limit -L   plays every file but the last L
 -d N  ou --depth N    limits the search to N levels of depth
---directory           group the played files by directory"
+--directory           group the played files by directory
+--novideo             only plays the audio of each file"
 
 ################ Example found in /usr/share/doc/util-linux/examples/getopt-parse.bash
 
