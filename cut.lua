@@ -67,10 +67,10 @@ local delim  = '\t'
 local fd     = {}
 local fields
 
-for opt, arg in getopt("b:f:d:", ...) do
+for opt, argument in getopt("b:f:d:", ...) do
   if opt then
     if opt == '?' then
-      io.stderr:write("Incorrect syntax for option "..arg.."\n\n")
+      io.stderr:write("Incorrect syntax for option "..argument.."\n\n")
       os.exit(1)
     elseif opt == 'b' then
       if fields then
@@ -78,28 +78,28 @@ for opt, arg in getopt("b:f:d:", ...) do
         os.exit(1)
       end
       mode = 'b'
-      fields = arg
+      fields = argument
     elseif opt == 'f' then
       if fields then
         io.stderr:write(arg[0]..": only one type of list may be specified\n")
         os.exit(1)
       end
-      fields = arg
+      fields = argument
     elseif opt == 'd' then
-      if #arg ~= 1 then
+      if #argument ~= 1 then
         io.stderr:write(arg[0]..": the delimiter must be a single character\n")
         os.exit(1)
       end
       mode = 'f'
-      delim = arg
+      delim = argument
     else
       io.stderr:write("Internal error\n\n")
       os.exit(1)
     end
   else -- command argument
-    local f = io.open(arg) -- interpreted as file to open
+    local f = io.open(argument) -- interpreted as file to open
     if not f then
-      io.stderr:write(arg[0]..": "..arg..": No such file or directory\n")
+      io.stderr:write(arg[0]..": "..argument..": No such file or directory\n")
       os.exit(1)
     else
       table.insert(fd, f)
