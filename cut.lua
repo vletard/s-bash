@@ -150,8 +150,6 @@ do
   end
 end
 
-local utils = dofile "/people/letard/local/lib/lua/toolbox.lua"
-
 for _, f in ipairs(fd) do
   for line in f:lines() do
     local splitted_line = {}
