@@ -1,13 +1,18 @@
 #!/bin/bash
 
-# Décrypte l'ensemble des fichiers fournis en argument vers la sortie standard
-# Le décryptage est symétrique à l'encryption de pack.sh et utilise la clé privée rsa dans ~/.ssh/
+# Decrypts the file provided in argument (or stdin) and unpacks its contents
 
-pass="$(tr -d '\\n' < $HOME/.ssh/id_rsa)"
+pass=
+
+if (( $# != 1 ))
+then
+  printf "Usage: %s ENCRYPTED_FILE\n" "$0" >&2
+  exit 1
+fi
 
 ################ Example found in /usr/share/doc/util-linux/examples/getopt-parse.bash
 
-TEMP=`getopt -o l --long list -n "$0" -- "$@"`
+TEMP=`getopt -o lf: --long list,key-file: -n "$0" -- "$@"`
 
 if [ $? != 0 ] ; then echo "Abandon" >&2 ; exit 1 ; fi
 
@@ -15,20 +20,25 @@ if [ $? != 0 ] ; then echo "Abandon" >&2 ; exit 1 ; fi
 eval set -- "$TEMP"
 
 while true ; do
-	case "$1" in
-		-l|--list)
+  case "$1" in
+    -f|--key-file)     
+      pass=$(tr -d '\\n' < $2)
+      shift 2 ;;
+    -l|--list)
       openssl aes-256-cbc -d -pass "pass:$pass" | tar tz
-			exit $? ;;
-		--) shift ; break ;;
-		*) echo "Internal error!" ; exit 1 ;;
-	esac
+      exit $? ;;
+    --) shift ; break ;;
+    *) echo "Internal error!" ; exit 1 ;;
+  esac
 done
 
 ################ End example ##########################################################
 
-if (( $# > 0 ))
+if [ "$pass" = "" ]
 then
-  cat $1 | openssl aes-256-cbc -d -pass "pass:$pass" | tar xvz
-else
-  openssl aes-256-cbc -d -pass "pass:$pass" | tar xvz
+  printf "Enter passphrase: "
+  read -s pass
+  printf "\n\n"
 fi
+
+cat $1 | openssl aes-256-cbc -d -pass "pass:$pass" | tar xvz
