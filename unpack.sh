@@ -3,12 +3,7 @@
 # Decrypts the file provided in argument (or stdin) and unpacks its contents
 
 pass=
-
-if (( $# != 1 ))
-then
-  printf "Usage: %s ENCRYPTED_FILE\n" "$0" >&2
-  exit 1
-fi
+comm=xvz
 
 ################ Example found in /usr/share/doc/util-linux/examples/getopt-parse.bash
 
@@ -25,14 +20,20 @@ while true ; do
       pass=$(tr -d '\\n' < $2)
       shift 2 ;;
     -l|--list)
-      openssl aes-256-cbc -d -pass "pass:$pass" | tar tz
-      exit $? ;;
+      comm=tz
+      shift ;;
     --) shift ; break ;;
     *) echo "Internal error!" ; exit 1 ;;
   esac
 done
 
 ################ End example ##########################################################
+
+if (( $# != 1 ))
+then
+  printf "Usage: %s ENCRYPTED_FILE\n" "$0" >&2
+  exit 1
+fi
 
 if [ "$pass" = "" ]
 then
@@ -41,4 +42,4 @@ then
   printf "\n\n"
 fi
 
-cat $1 | openssl aes-256-cbc -d -pass "pass:$pass" | tar xvz
+cat $1 | openssl aes-256-cbc -d -pass "pass:$pass" | tar $comm
