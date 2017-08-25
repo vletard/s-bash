@@ -3,10 +3,11 @@
 # Recursively encrypts the files given in argument to stdout
 
 pass=
+output=
 
 ################ Example found in /usr/share/doc/util-linux/examples/getopt-parse.bash
 
-TEMP=`getopt -o f: --long key-file: -n "$0" -- "$@"`
+TEMP=`getopt -o f:ho: --long key-file:,help -n "$0" -- "$@"`
 
 if [ $? != 0 ] ; then echo "Abandon" >&2 ; exit 1 ; fi
 
@@ -18,12 +19,28 @@ while true ; do
     -f|--key-file)     
       pass=$(tr -d '\\n' < $2)
       shift 2 ;;
+    -o)
+      output=$2
+      shift 2 ;;
+    -h|--help)
+      shift $# ; break ;;
     --) shift ; break ;;
     *) echo "Internal error!" ; exit 1 ;;
   esac
 done
 
 ################ End example ##########################################################
+
+if (( $# != 1 ))
+then
+  printf "Usage: %s [-f PASS_FILE] [-l] [-o OUTPUT_FILE] FILE[S]\n" "$0" >&2
+  printf "\nOptions:\n" >&2
+  printf "   -f, --key-file      reads the content of PASS_FILE as password instead of prompting from stdin\n" >&2
+  printf "   -o                  encrypts the FILES into OUTPUT_FILE instead of stdout\n" >&2
+  printf "   -h, --help          prints this message\n" >&2
+  exit 1
+fi
+
 
 if [ "$pass" = "" ]
 then
@@ -32,6 +49,11 @@ then
   printf "\n\n" >&2
 fi
 
-printf "Warning: encoding to stdout!\nctrl-c to cancel\n\n" >&2
-sleep 17
-tar cvz "$@" | openssl aes-256-cbc -salt -pass "pass:$pass"
+if test -z $output
+then
+  printf "Warning: encoding to stdout!\nctrl-c to cancel\n\n" >&2
+  sleep 17
+  tar cvz "$@" | openssl aes-256-cbc -salt -pass "pass:$pass"
+else
+  tar cvz "$@" | openssl aes-256-cbc -salt -pass "pass:$pass" > $output
+fi
