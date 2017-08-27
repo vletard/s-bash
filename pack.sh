@@ -31,7 +31,7 @@ done
 
 ################ End example ##########################################################
 
-if (( $# != 1 ))
+if (( $# < 1 ))
 then
   printf "Usage: %s [-f PASS_FILE] [-l] [-o OUTPUT_FILE] FILE[S]\n" "$0" >&2
   printf "\nOptions:\n" >&2
@@ -47,6 +47,14 @@ then
   printf "Enter passphrase: " >&2
   read -s pass
   printf "\n\n" >&2
+  printf "Confirm passphrase: " >&2
+  read -s pass2
+  printf "\n\n" >&2
+  if [ "$pass2" != "$pass" ]
+  then
+    echo "Non matching passphrases, aborting." >&2
+    exit 1
+  fi
 fi
 
 if test -z $output
