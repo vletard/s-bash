@@ -2,6 +2,7 @@
 
 limit=-0
 dir=false
+sub_dir=-R
 mpoptions=
 
 FILETYPES="mp3|wma|flac|caf|wav|ogg|flv|avi|mp4|mov"
@@ -18,11 +19,12 @@ OPTIONS
 -n -L ou --limit -L   plays every file but the last L
 -d N  ou --depth N    limits the search to N levels of depth
 --directory           group the played files by directory
+--straight-dir        keep every file in each directory in their natural ordering
 --novideo             only plays the audio of each file"
 
 ################ Example found in /usr/share/doc/util-linux/examples/getopt-parse.bash
 
-TEMP=`getopt -o d:n:h --long novideo,depth:,limit:,help,directory -n "$0" -- "$@"`
+TEMP=`getopt -o d:n:h --long novideo,depth:,limit:,help,directory,straight-dir -n "$0" -- "$@"`
 
 if [ $? != 0 ] ; then echo "Abandon" >&2 ; exit 1 ; fi
 
@@ -35,6 +37,7 @@ while true ; do
     --novideo) mpoptions="$mpoptions -novideo"; shift ;;
 		-d|--depth) depth="-maxdepth $2" ; shift 2 ;;
 		--directory) dir=true ; shift ;;
+		--straight-dir) sub_dir= ; shift ;;
 		-h|--help) echo "$HELP"
                            exit 0 ;;
 		--) shift ; break ;;
@@ -86,7 +89,7 @@ then
 '
   for d in $(find "$@" $depth -regextype posix-extended -type d | sort -R)
   do
-    find "$d" -maxdepth 1 -regextype posix-extended -iregex "(\./)?([^.][^/]*/)*([^.][^/]*)\.($FILETYPES)" | sort -R > .playlist
+    find "$d" -maxdepth 1 -regextype posix-extended -iregex "(\./)?([^.][^/]*/)*([^.][^/]*)\.($FILETYPES)" | sort $sub_dir > .playlist
     if (( $(wc -l < .playlist) > 0 ))
     then
       print_len
