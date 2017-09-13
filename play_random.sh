@@ -4,7 +4,7 @@ limit=-0
 dir=false
 mpoptions=
 
-FILETYPES="mp3|wma|flac|caf|wav|ogg|flv|avi|mp4|mov"
+FILETYPES="mp3|wma|flac|caf|wav|ogg|aiff|m4a|flv|avi|mp4|mov"
 
 HELP="
 Usage: $0 [OPTIONS] [DIRECTORIES]
