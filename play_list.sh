@@ -5,7 +5,7 @@ scrobble=false
 
 mplayer="mplayer -msglevel lirc=0:demuxer=0:subreader=0:decaudio=0:decvideo=0"
 
-FILETYPES="mp3|wma|caf|flac|wav|ogg"
+FILETYPES="mp3|wma|caf|flac|wav|ogg|aiff|m4a"
 
 HELP="Usage : $0 PLAYLIST [OPTION]
 Lit la PLAYLIST à partir des fichiers de types $FILETYPES
