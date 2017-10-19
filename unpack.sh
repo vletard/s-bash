@@ -5,6 +5,7 @@
 pass=
 comm=xvz
 compat="-md sha256"
+help=false
 
 ################ Example found in /usr/share/doc/util-linux/examples/getopt-parse.bash
 
@@ -21,7 +22,7 @@ while true ; do
       comm=tz
       shift ;;
     -h|--help)
-      shift $# ; break ;;
+      help=true; shift; break ;;
     --) shift ; break ;;
     *) echo "Internal error!" ; exit 1 ;;
   esac
@@ -29,7 +30,7 @@ done
 
 ################ End example ##########################################################
 
-if (( $# != 1 ))
+if $help
 then
   printf "Usage: %s ENCRYPTED_FILE [-f PASS_FILE] [-l]\n" "$0" >&2
   printf "\nOptions:\n" >&2
@@ -38,4 +39,14 @@ then
   exit 1
 fi
 
-openssl aes-256-cbc $compat -d -in $1 | tar $comm
+if (( $# > 0 ))
+then
+  openssl aes-256-cbc $compat -d -in $1 | tar $comm
+else
+  skipping_lines=$(grep -anm1 "^__END_SCRIPT__$" < $0 | cut -f 1 -d ':')
+  openssl aes-256-cbc $compat -d -in <(tail -n +$((skipping_lines + 1)) < $0) | tar $comm
+fi
+
+exit $?
+
+__END_SCRIPT__
