@@ -91,7 +91,7 @@ for opt, argument in getopt("b:f:d:", ...) do
         os.exit(1)
       end
       mode = 'f'
-      delim = argument
+      delim = "%"..argument
     else
       io.stderr:write("Internal error\n\n")
       os.exit(1)
@@ -168,13 +168,13 @@ for _, f in ipairs(fd) do
 
     for i, field in ipairs(fields_list) do
       if i > 1 then
-        io.stdout:write(delim)
+        io.stdout:write(delim:sub(-1))
       end
       if type(field) == "string" then
         local f_start = tonumber(field:match("^(%d+)%+$"))
         for j = f_start, #splitted_line do
           if j > f_start then
-            io.stdout:write(delim)
+            io.stdout:write(delim:sub(-1))
           end
           io.stdout:write(splitted_line[j])
         end
