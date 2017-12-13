@@ -6,10 +6,11 @@ pass=
 output=
 compat="-md sha256"
 self=false
+comm=cvz
 
 ################ Example found in /usr/share/doc/util-linux/examples/getopt-parse.bash
 
-TEMP=`getopt -o ho:s --long help,self-extract    -n "$0" -- "$@"`
+TEMP=`getopt -o hvqo:s --long help,quiet,verbose,self-extract    -n "$0" -- "$@"`
 
 if [ $? != 0 ] ; then echo "Abandon" >&2 ; exit 1 ; fi
 
@@ -24,6 +25,12 @@ while true ; do
     -o)
       output=$2
       shift 2 ;;
+    -q|--quiet)
+      comm=cz
+      shift ;;
+    -v|--verbose)
+      comm=cvz
+      shift ;;
     -h|--help)
       shift $# ; break ;;
     --) shift ; break ;;
@@ -40,6 +47,8 @@ then
   printf "   -o                  encrypts the FILES into OUTPUT_FILE instead of stdout\n" >&2
   printf "   -s, --self-extract  makes the produced file a self extractible bash binary\n" >&2
   printf "                       simply execute the produced file to unpack            \n" >&2
+  printf "   -q, --quiet         runs silently\n" >&2
+  printf "   -v, --verbose       prints every encrypted filename (this is default)\n" >&2
   printf "   -h, --help          prints this message\n" >&2
   exit 1
 fi
@@ -48,14 +57,14 @@ if test -z $output
 then
   printf "Warning: encoding to stdout!\nctrl-c to cancel\n\n" >&2
   sleep 2
-  (sleep 23; tar cvz "$@") | openssl aes-256-cbc -salt $compat | if $self
+  (sleep 23; tar $comm "$@") | openssl aes-256-cbc -salt $compat | if $self
   then
     cat $(which unpack.sh) -
   else
     cat
   fi
 else
-  (sleep 23; tar cvz "$@") | openssl aes-256-cbc -salt $compat | if $self
+  (sleep 23; tar $comm "$@") | openssl aes-256-cbc -salt $compat | if $self
   then
     cat $(which unpack.sh) -
   else
