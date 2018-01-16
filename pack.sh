@@ -53,25 +53,32 @@ then
   exit 1
 fi
 
-if test -z $output
+export passwd=""
+
+while test -z $passwd
+do
+  read -sp "Enter password: " passwd
+  echo
+  read -sp "Repeat password: " confirm
+  if [ "$passwd" != "$confirm" ]
+  then
+    echo "Confirmation failed."
+    passwd=""
+  fi
+done
+
+tar $comm "$@" | openssl aes-256-cbc -pass env:passwd -salt $compat | if $self
 then
-  printf "Warning: encoding to stdout!\nctrl-c to cancel\n\n" >&2
-  sleep 2
-  (sleep 23; tar $comm "$@") | openssl aes-256-cbc -salt $compat | if $self
-  then
-    cat $(which unpack.sh) -
-  else
-    cat
-  fi
+  cat $(which unpack.sh) -
 else
-  (sleep 23; tar $comm "$@") | openssl aes-256-cbc -salt $compat | if $self
-  then
-    cat $(which unpack.sh) -
-  else
-    cat
-  fi > $output
-  if $self
-  then
-    chmod u+x $output
-  fi
+  cat
+fi | if test -z "$output"
+then
+  cat
+else
+  cat > $output
+fi
+if $self
+then
+  chmod u+x $output
 fi
