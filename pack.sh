@@ -78,7 +78,7 @@ then
 else
   cat > $output
 fi
-if $self
+if $self && ! [ -z "$output" ]
 then
   chmod u+x $output
 fi
