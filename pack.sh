@@ -34,7 +34,7 @@ while true ; do
     -h|--help)
       shift $# ; break ;;
     --) shift ; break ;;
-    *) echo "Internal error!" ; exit 1 ;;
+    *) echo "Internal error!" >&2 ; exit 1 ;;
   esac
 done
 
@@ -58,11 +58,11 @@ export passwd=""
 while test -z $passwd
 do
   read -sp "Enter password: " passwd
-  echo
+  echo >&2
   read -sp "Repeat password: " confirm
   if [ "$passwd" != "$confirm" ]
   then
-    echo "Confirmation failed."
+    echo "Confirmation failed." >&2
     passwd=""
   fi
 done
