@@ -37,6 +37,9 @@ done
 
 ################ End example ##########################################################
 
+# This script is not meant to be used alone.
+# It should be part of a self extracting archive.
+
 if $help
 then
   printf "Usage: %s ENCRYPTED_FILE [-f PASS_FILE] [-l]\n" "$0" >&2
@@ -50,10 +53,10 @@ fi
 
 if (( $# > 0 ))
 then
-  openssl aes-256-cbc $compat -d -in $1 | tar ${comm}${verb}z
+  openssl aes-256-cbc $compat -d -in $1 -pbkdf2 | tar ${comm}${verb}z
 else
   skipping_lines=$(grep -anm1 "^__END_SCRIPT__$" < $0 | cut -f 1 -d ':')
-  openssl aes-256-cbc $compat -d -in <(tail -n +$((skipping_lines + 1)) < $0) | tar ${comm}${verb}z
+  openssl aes-256-cbc $compat -d -in <(tail -n +$((skipping_lines + 1)) < $0) -pbkdf2 | tar ${comm}${verb}z
 fi
 
 exit $?

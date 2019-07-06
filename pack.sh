@@ -10,7 +10,7 @@ comm=cvz
 
 ################ Example found in /usr/share/doc/util-linux/examples/getopt-parse.bash
 
-TEMP=`getopt -o hvqo:s --long help,quiet,verbose,self-extract    -n "$0" -- "$@"`
+TEMP=`getopt -o hvqo: --long help,quiet,verbose    -n "$0" -- "$@"`
 
 if [ $? != 0 ] ; then echo "Abandon" >&2 ; exit 1 ; fi
 
@@ -19,9 +19,6 @@ eval set -- "$TEMP"
 
 while true ; do
   case "$1" in
-    -s|--self-extract)
-      self=true
-      shift ;;
     -o)
       output=$2
       shift 2 ;;
@@ -40,13 +37,11 @@ done
 
 ################ End example ##########################################################
 
-if (( $# < 1 ))
+if (( $# < 1 )) || [ -z "$output" ]
 then
-  printf "Usage: %s [-f PASS_FILE] [-l] [-o OUTPUT_FILE] FILE[S]\n" "$0" >&2
+  printf "Usage: %s [-f PASS_FILE] [-l] -o OUTPUT_FILE FILE[S]\n" "$0" >&2
   printf "\nOptions:\n" >&2
-  printf "   -o                  encrypts the FILES into OUTPUT_FILE instead of stdout\n" >&2
-  printf "   -s, --self-extract  makes the produced file a self extractible bash binary\n" >&2
-  printf "                       simply execute the produced file to unpack            \n" >&2
+  printf "   -o                  encrypts the FILES into OUTPUT_FILE (this argument is mandatory)\n" >&2
   printf "   -q, --quiet         runs silently\n" >&2
   printf "   -v, --verbose       prints every encrypted filename (this is default)\n" >&2
   printf "   -h, --help          prints this message\n" >&2
@@ -67,18 +62,6 @@ do
   fi
 done
 
-tar $comm "$@" | openssl aes-256-cbc -pass env:passwd -salt $compat | if $self
-then
-  cat $(which unpack.sh) -
-else
-  cat
-fi | if test -z "$output"
-then
-  cat
-else
-  cat > $output
-fi
-if $self && ! [ -z "$output" ]
-then
-  chmod u+x $output
-fi
+tar $comm "$@" | openssl aes-256-cbc -pass env:passwd -pbkdf2 -salt $compat | cat $(which unpack.sh) - > $output
+
+chmod u+x $output
