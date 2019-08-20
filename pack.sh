@@ -8,6 +8,8 @@ compat="-md sha256"
 self=false
 comm=cvz
 
+set -eo pipefail
+
 ################ Example found in /usr/share/doc/util-linux/examples/getopt-parse.bash
 
 TEMP=`getopt -o hvqo: --long help,quiet,verbose    -n "$0" -- "$@"`
@@ -48,6 +50,7 @@ then
   exit 1
 fi
 
+touch $output
 export passwd=""
 
 while test -z $passwd
