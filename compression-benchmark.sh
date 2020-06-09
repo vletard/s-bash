@@ -9,8 +9,9 @@ then
   exit 1
 fi
 
-for input in "$*"
+for input in "$@"
 do
+  input=${input%/}
   for method in xz lzma gzip bzip2
   do
     tar c "$input" > "${input}".tar
