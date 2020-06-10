@@ -19,7 +19,7 @@ do
   done
 
   tar c "$input" > "${input}".tar
-  lrzip -z "${input}".tar
+  lrzip -z -p 1 "${input}".tar
 
   du -sh "${input}".tar* | sort -h
 done
