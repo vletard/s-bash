@@ -27,7 +27,7 @@ OPTIONS
 
 ################ Example found in /usr/share/doc/util-linux/examples/getopt-parse.bash
 
-TEMP=`getopt -o d:ln:bhs --long list,delete:,scrobble,build,help -n "$0" -- "$@"`
+TEMP=`getopt -o d:ln:b:hs --long list,delete:,scrobble,build:,help -n "$0" -- "$@"`
 
 if [ $? != 0 ] ; then echo "Abandon" >&2 ; exit 1 ; fi
 
@@ -45,8 +45,8 @@ function print_entry {
 while true ; do
   case "$1" in
     -b|--build)
-        build=true
-        shift ;;
+        build_name=$2
+        shift 2;;
     -s|--scrobble)
         scrobble=true
         shift ;;
@@ -85,26 +85,26 @@ while true ; do
   esac
 done
 
-if (( $# != 1 ))
-then
-#  echo -e $HELP
-  len=$(ls -1 .playlists | wc -L)
-  echo -e "Playlists disponibles :\n"
-  total=$(find . -regextype posix-extended -iregex "(\./)?([^.][^/]*/)*([^.][^/]*)\.($FILETYPES)" | wc -l)
-  {
-    IFS=$'\n'
-    for line in $(ls .playlists)
-    do
-      print_entry "$line" $total $len
-    done
-  }
-  exit 0
-fi
+# if (( $# != 1 ))
+# then
+# #  echo -e $HELP
+#   len=$(ls -1 .playlists | wc -L)
+#   echo -e "Playlists disponibles :\n"
+#   total=$(find . -regextype posix-extended -iregex "(\./)?([^.][^/]*/)*([^.][^/]*)\.($FILETYPES)" | wc -l)
+#   {
+#     IFS=$'\n'
+#     for line in $(ls .playlists)
+#     do
+#       print_entry "$line" $total $len
+#     done
+#   }
+#   exit 0
+# fi
 
 ################ End example ##########################################################
 
 function build {
-  find . -regextype posix-extended -iregex "(\./)?([^.][^/]*/)*([^.][^/]*)\.($FILETYPES)" | sort -R > .playlist
+  find $2 -regextype posix-extended -iregex "(\./)?([^.][^/]*/)*([^.][^/]*)\.($FILETYPES)" | sort -R > .playlist
   touch ".playlists/$1"
   touch ".playlists/.$1"
   while (( $(cat .playlist | wc -l) > 0 ))
@@ -156,10 +156,13 @@ function build {
   mv -v .playlist /tmp
 }
 
+directories="."
+if (( $# >= 1 ))
+then
+  directories=$*
+fi
 
-
-
-if [ "$build" = "true" ]
+if [ ! -z "$build_name" ]
 then
   touch .playlist
   while [ -f .playlist ]
@@ -173,7 +176,7 @@ then
       '*') echo "volume 1" ;;
       '/') echo "volume 0" ;;
     esac
-  done | build "$1"
+  done | build "$build_name" "$directories"
 else
   if ! test -f ".playlists/$1"
   then
